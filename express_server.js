@@ -41,15 +41,23 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longUrl);
 });
 
+
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-delete urlDatabase[req.params.shortURL];
-// delete url;
-res.redirect('/urls');
+  delete urlDatabase[req.params.shortURL];
+  res.redirect('/urls');
+}); 
+
+
+app.post("/urls/:shortURL/modify", (req, res) => {
+  const url = req.params.shortURL;
+  const newUrl = req.body.URL;
+  urlDatabase[url] = newUrl;
+  res.redirect('/urls');
 }); 
 
 
