@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const PORT = 8080; // default port 8080
 
+// middleware
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -15,14 +16,16 @@ const urlDatabase = {
 
 app.set('view engine', 'ejs');
 
-// app.get('/', (req, res) => {
-//   res.send('Hello!');
-// });
+app.get('/register', (req, res) => {
+
+  res.render('registeration');
+});
 
 // app.get("/urls.json", (req, res) => {
 //   res.json(urlDatabase);
 // });
 
+// routes
 
 app.get("/urls", (req, res) => {
   const templateVars = { 
@@ -77,16 +80,14 @@ app.post("/logout", (req,res) => {
   res.redirect('/urls');
 });
 
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
 
-
+// confirmation that the server is on
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 })
 
+// functions
 
 function generateRandomString() {
   return Math.random().toString(36).substr(2, 6);
