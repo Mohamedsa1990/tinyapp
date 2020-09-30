@@ -29,6 +29,12 @@ const users = {};
 // routes --------------------------------------------------
 
 // GET Requests
+
+
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
 app.get('/register', (req, res) => {
   res.render('registeration');
 });
@@ -96,16 +102,24 @@ app.post("/logout", (req,res) => {
 });
 
 app.post('/register', (req,res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  if(email === "" || password === "") {
+    res.status(400);
+    res.send('Invalid Email or password');
+  } else if (emailLookup(email)) {
+    res.status(400);
+    res.send('username already exists please remember your password or try forget my password featurer that are not exist yet');
+  } else {
   const id = generateRandomString();
   users[id] = { 
     id : id,
     email: req.body.email,
     password: req.body.password,
   }
-  // console.log(req.body);
   res.cookie('user_id', id);
-  console.log(users);
   res.redirect('/urls');
+  }
 });
 
 
@@ -119,6 +133,16 @@ app.listen(PORT, () => {
 
 function generateRandomString() {
   return Math.random().toString(36).substr(2, 6);
+}
+
+function emailLookup(email) {
+  for(let user in users) {
+    if (users[user].email === email) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 
 
