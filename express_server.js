@@ -10,6 +10,8 @@ const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 app.set('view engine', 'ejs');
 
+const bcrypt = require('bcrypt');
+
 
 // global variables --------------------------------------------------
 
@@ -46,7 +48,7 @@ app.get("/urls", (req, res) => {
     urls: userURl,
     user: users[req.cookies["user_id"]],
   };
-  console.log('database', urlDatabase)
+  // console.log('database', urlDatabase)
   console.log('user', users)
   if (templateVars.user) {
     res.render("urls_index", templateVars);
@@ -120,8 +122,9 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const user = emailLookup(email);
-  if (emailLookup(email)) {
-    if (password === users[user].password) {
+  if (user) {
+    const passwordMatching = bcrypt.compareSync(password, users[user].password);
+    if (passwordMatching) {
       res.cookie('user_id', users[user].id);
       res.redirect('/urls');
     } else {
@@ -142,6 +145,7 @@ app.post("/logout", (req,res) => {
 app.post('/register', (req,res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   if(email === "" || password === "") {
     res.status(400);
     res.send('Invalid Email or password');
@@ -152,8 +156,8 @@ app.post('/register', (req,res) => {
   const id = generateRandomString();
   users[id] = { 
     id : id,
-    email: req.body.email,
-    password: req.body.password,
+    email: email,
+    password: hashedPassword,
   }
   res.cookie('user_id', id);
   res.redirect('/urls');
