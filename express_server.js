@@ -92,9 +92,22 @@ app.post("/urls/:shortURL/modify", (req, res) => {
 }); 
 
 app.post("/login", (req, res) => {
-  // res.cookie('username', req.body.username);
-  res.redirect('/urls');
-})
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = emailLookup(email);
+  if (emailLookup(email)) {
+    if (password === users[user].password) {
+      res.cookie('user_id', users[user].id);
+      res.redirect('/urls');
+    } else {
+      res.status(403);
+      res.send('Invalid Password');
+    }
+  } else {
+    res.status(403);
+    res.send('invalid email please register');
+  }
+});
 
 app.post("/logout", (req,res) => {
   res.clearCookie('user_id');
@@ -109,7 +122,7 @@ app.post('/register', (req,res) => {
     res.send('Invalid Email or password');
   } else if (emailLookup(email)) {
     res.status(400);
-    res.send('username already exists please remember your password or try forget my password featurer that are not exist yet');
+    res.send('Email already exists please remember your password or try forget my password featurer that are not exist yet');
   } else {
   const id = generateRandomString();
   users[id] = { 
@@ -138,7 +151,7 @@ function generateRandomString() {
 function emailLookup(email) {
   for(let user in users) {
     if (users[user].email === email) {
-      return true;
+      return user;
     } else {
       return false;
     }
